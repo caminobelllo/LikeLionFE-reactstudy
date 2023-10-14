@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import Home from "./screens/Home";
 import About from "./screens/About";
 import Root from "./Root";
+import NotFound from "./screens/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
         element: <About />,
       },
     ],
+    errorElement: <NotFound />,
   },
 ]);
 
