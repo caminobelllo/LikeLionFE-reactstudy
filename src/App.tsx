@@ -1,5 +1,12 @@
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+} from "react-beautiful-dnd";
 import styled from "styled-components";
+import { toDoState } from "./atoms";
+import { useRecoilState } from "recoil";
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,10 +39,33 @@ const Card = styled.div`
   background-color: ${(props) => props.theme.cardColor};
 `;
 
-const toDos = ["a", "b", "c", "d", "e", "f"];
-
 function App() {
-  const onDragEnd = () => {};
+  const [toDos, setToDos] = useRecoilState(toDoState);
+
+  const onDragEnd = ({ destination, source }: DropResult) => {
+    if (!destination) return;
+    setToDos((oldToDos) => {
+      const toDosCopy = [...oldToDos];
+
+      // Get the dragged item using the source index
+      const draggedItem = toDosCopy[source.index];
+
+      // 1) Delete item on source.index
+      console.log("Delete item on", source.index);
+      console.log(toDosCopy);
+      toDosCopy.splice(source.index, 1);
+      console.log("Deleted item");
+      console.log(toDosCopy);
+
+      // 2) Put back the item on the destination.index
+      console.log("Put back", draggedItem, "on ", destination.index);
+      toDosCopy.splice(destination?.index, 0, draggedItem);
+      console.log(toDosCopy);
+
+      return toDosCopy;
+    });
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
@@ -44,7 +74,7 @@ function App() {
             {(magic) => (
               <Board ref={magic.innerRef} {...magic.droppableProps}>
                 {toDos.map((toDo, index) => (
-                  <Draggable draggableId={toDo} index={index}>
+                  <Draggable key={toDo} draggableId={toDo} index={index}>
                     {(magic) => (
                       <Card
                         ref={magic.innerRef}
