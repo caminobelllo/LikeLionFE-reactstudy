@@ -27,10 +27,13 @@ function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
 
   const onDragEnd = (info: DropResult) => {
-    console.log(info);
     const { destination, draggableId, source } = info;
+
+    // destination이 없다면 함수를 종료시킴
+    if (!destination) return;
+
     if (destination?.droppableId === source.droppableId) {
-      // same board movement.
+      // 두 개가 동일한 경우에는 같은 블록
       setToDos((allBoards) => {
         const boardCopy = [...allBoards[source.droppableId]];
         boardCopy.splice(source.index, 1);
@@ -41,26 +44,25 @@ function App() {
         };
       });
     }
-    // setToDos((oldToDos) => {
-    //   const toDosCopy = [...oldToDos];
 
-    //   // Get the dragged item using the source index
-    //   const draggedItem = toDosCopy[source.index];
+    if (destination?.droppableId !== source.droppableId) {
+      // 두 개가 다르면 다른 블록 간의 이동
+      setToDos((allBoards) => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        // 움직임이 시작된 board의 복사본
+        const destinaationBoard = [...allBoards[destination.droppableId]];
+        // 움직임이 끝난 board의 복사본
 
-    //   // 1) Delete item on source.index
-    //   console.log("Delete item on", source.index);
-    //   console.log(toDosCopy);
-    //   toDosCopy.splice(source.index, 1);
-    //   console.log("Deleted item");
-    //   console.log(toDosCopy);
+        sourceBoard.splice(source.index, 1);
+        destinaationBoard.splice(destination?.index, 0, draggableId);
 
-    //   // 2) Put back the item on the destination.index
-    //   console.log("Put back", draggedItem, "on ", destination.index);
-    //   toDosCopy.splice(destination?.index, 0, draggedItem);
-    //   console.log(toDosCopy);
-
-    //   return toDosCopy;
-    // });
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destinaationBoard,
+        };
+      });
+    }
   };
 
   return (
