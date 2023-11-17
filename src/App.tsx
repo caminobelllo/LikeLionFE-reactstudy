@@ -36,8 +36,10 @@ function App() {
       // 두 개가 동일한 경우에는 같은 블록
       setToDos((allBoards) => {
         const boardCopy = [...allBoards[source.droppableId]];
+        const taskObj = boardCopy[source.index]; // 옮기려고 하는 toDo object 전체를 받음
+
         boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination?.index, 0, draggableId);
+        boardCopy.splice(destination?.index, 0, taskObj);
         return {
           ...allBoards,
           [source.droppableId]: boardCopy,
@@ -48,13 +50,12 @@ function App() {
     if (destination?.droppableId !== source.droppableId) {
       // 두 개가 다르면 다른 블록 간의 이동
       setToDos((allBoards) => {
-        const sourceBoard = [...allBoards[source.droppableId]];
-        // 움직임이 시작된 board의 복사본
-        const destinaationBoard = [...allBoards[destination.droppableId]];
-        // 움직임이 끝난 board의 복사본
+        const sourceBoard = [...allBoards[source.droppableId]]; // 움직임이 시작된 board의 복사본
+        const taskObj = sourceBoard[source.index]; // 옮기려고 하는 toDo object 전체를 받음
+        const destinaationBoard = [...allBoards[destination.droppableId]]; // 움직임이 끝난 board의 복사본
 
         sourceBoard.splice(source.index, 1);
-        destinaationBoard.splice(destination?.index, 0, draggableId);
+        destinaationBoard.splice(destination?.index, 0, taskObj);
 
         return {
           ...allBoards,

@@ -3,7 +3,9 @@ import styled from "styled-components";
 import DragabbleCard from "./DragabbleCard";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { ITodo } from "../atoms";
+import { ITodo, toDoState } from "../atoms";
+import { text } from "stream/consumers";
+import { useSetRecoilState } from "recoil";
 
 const Wrapper = styled.div`
   padding-top: 10px;
@@ -56,11 +58,24 @@ interface IForm {
 }
 
 function Board({ toDos, boardId }: IBoardProps) {
+  const setToDos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const onValid = ({ toDo }: IForm) => {
     // form이 valid 할 때 호출되는 함수
-    console.log(toDo);
-    setValue("toDo", ""); // value를 submit 할 때마다 input을 empty로 만들어 줌
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    setToDos((allBoards) => {
+      return {
+        ...allBoards,
+        [boardId]: [newToDo, ...allBoards[boardId]],
+        // [newToDo, ...allBoards[boardId]] 의 순서에 따라
+        // newToDo가 앞에 있으면 최근에 추가한 card가 맨 위에
+        // 뒤에 있으면 최근데 추가한 card가 맨 아래에 추가된다.
+      };
+    });
+    setValue("toDo", ""); // setValue() : value를 submit 할 때마다 input을 empty로 만들어 줌
   };
 
   return (
